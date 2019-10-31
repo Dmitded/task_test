@@ -1,45 +1,29 @@
-// import userAPI from '@/api/user'
+import userAPI from '@/api/user'
 
-// export default {
+export default {
 
-//   state: {
-//     users: undefined,
-//     current: undefined
-//   },
+  state: {
+    current: undefined
+  },
 
-//   mutations: {
-//     setUsers (state, users) {
-//       state.users = users.reverse()
-//     },
-//     setUser (state, user) {
-//       state.current = user
-//     }
-//   },
+  mutations: {
+    setData (state, current) {
+      state.current = current
+    }
+  },
 
-//   actions: {
-//     async login ({ commit }, credentials) {
-//       await userAPI.login(credentials)
-//     },
+  actions: {
+    async login ({ commit }, credentials) {
+      await userAPI.login(credentials)
+    },
 
-//     async register ({ commit }, credentials) {
-//       await userAPI.register(credentials)
-//     },
+    // async register ({ commit }, credentials) {
+    //   await userAPI.register(credentials)
+    // },
 
-//     async logout ({ commit }) {
-//       await userAPI.logout()
-//       commit('setUser', undefined)
-//     },
-
-//     async getUsers ({ commit }) {
-//       const users = await userAPI.getUsers()
-//       commit('setUsers', users)
-//     },
-
-//     async getCurrentUser ({ commit }) {
-//       const user = await userAPI.getCurrentUser()
-//       if (user !== 401 && 502) {
-//         commit('setUser', user)
-//       }
-//     }
-//   }
-// }
+    async getData ({ commit }) {
+      const users = await userAPI.getData()
+      commit('setData', users)
+    }
+  }
+}
