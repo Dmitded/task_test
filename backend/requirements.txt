@@ -1,6 +1,7 @@
 falcon
 gunicorn
 marshmallow
+marshmallow-enum
 SQLAlchemy
 psycopg2-binary
 redis
