@@ -46,7 +46,46 @@
     </v-snackbar>
 
     <v-container class="my-0 py-0" v-if="loginShow === true">
-      
+      <v-toolbar color="error" dark class="my-3">
+        <v-toolbar-title>Панель менеджера</v-toolbar-title>
+
+        <v-spacer></v-spacer>
+
+        <v-toolbar-items>
+
+          <v-text-field
+            class="my-auto"
+            v-model="search"
+            label="Search"
+            color="white"
+            single-line
+            hide-details
+            append-icon="search"
+          ></v-text-field>
+          <v-btn text>Выбор даты</v-btn>
+        </v-toolbar-items>
+
+        <v-btn icon @click="logout">
+          <v-icon>mdi-exit-to-app</v-icon>
+        </v-btn>
+      </v-toolbar>
+
+      <v-flex lg4>
+        <v-data-table
+          :headers="headers"
+          :items="desserts"
+          :sort-by="[]"
+          :sort-desc="[false, true]"
+          :items-per-page="-1"
+          :search="search"
+          multi-sort
+          class="elevation-1 mb-5"
+        >
+        <template v-slot:item.status="{ item }">
+          <v-chip :color="getColor(item.status)" dark>{{ item.status }}</v-chip>
+        </template>
+        </v-data-table>
+      </v-flex>
     </v-container>
   </v-content>
 </template>
@@ -62,7 +101,39 @@ export default {
   name: 'Home',
   data () {
     return {
-      loginShow: false,
+      search: '',
+      headers: [
+        {
+          text: 'Рабочий',
+          align: 'left',
+          value: 'worker'
+        },
+        { text: 'Килограммов', align: 'center', value: 'payload' },
+        { text: 'Статус', align: 'center', value: 'status' }
+      ],
+      desserts: [
+        {
+          worker: 'Frozen Yogurt',
+          payload: 6.0,
+          status: 'Выполнено'
+        },
+        {
+          worker: 'Ice cream sandwich',
+          payload: 6.0,
+          status: 'В процессе'
+        },
+        {
+          worker: 'Eclair',
+          payload: 6.0,
+          status: 'Ошибка'
+        },
+        {
+          worker: 'Cupcake',
+          payload: 6.0,
+          status: 'Выполнено'
+        }
+      ],
+      loginShow: true,
       user: {
         login: '',
         password: ''
@@ -74,7 +145,7 @@ export default {
           },
           password: {
             required: () => 'Поле пароля не может быть пустым'
-          }// this.$validator.localize('ru', this.dictionary)
+          }
         }
       },
       notification: {
@@ -91,19 +162,31 @@ export default {
   },
 
   methods: {
+    getColor (status) {
+      if (status === 'Ошибка') return 'red'
+      else if (status === 'В процессе') return 'orange'
+      else return 'green'
+    },
     async login () {
       const valid = await this.$validator.validate()
       if (valid) {
         const resp = await authAPI.login(this.user)
         if (resp === 401) {
           this.notification.snackbar = true
-          this.user.email = ''
+          this.user.login = ''
           this.user.password = ''
         } else {
           await this.$store.dispatch('getData')
+          this.user.login = ''
+          this.user.password = ''
           this.loginShow = true
         }
       }
+    },
+
+    async logout () {
+      await this.$store.dispatch('logout')
+      this.loginShow = false
     }
   }
 }

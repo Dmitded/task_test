@@ -12,6 +12,23 @@ export default {
     }
   },
 
+  async logout () {
+    try {
+      await axios.get('/logout')
+    } catch (error) {
+      return error.response.status
+    }
+  },
+
+  async getCurrentUser () {
+    try {
+      const user = await axios.get('/users/current')
+      return user.data
+    } catch (error) {
+      return error.response.status
+    }
+  },
+
   // async register (credentials) {
   //   try {
   //     await axios.post('/users', {
