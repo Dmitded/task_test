@@ -55,8 +55,8 @@ create database tasktest;
 ```bash
 cd backend
 python3 -m venv env
-./env/bin/pip3 install - r requirements.txt
-alembic upgrade head # запуск миграций
+./env/bin/pip3 install -r requirements.txt
+./env/bin/alembic upgrade head # запуск миграций
 chmod +x test_data.py
 ./test_data.py # заполнение БД тестовыми значениями и запись данных для входа в файл inspector.txt
 ./dev.sh # запуск (gunicorn)
@@ -81,7 +81,7 @@ chmod +x test_data.py
 
 [GET] /api/users/current  ` Получение данных об авторизованном пользователе `
 
-[GET] /api/activity?date=2019-05-13  ` Получение сведений об активности за дату - 2019-05-13 `
+[GET] /api/activity?day=2019-05-13  ` Получение сведений об активности за дату - 2019-05-13 `
 
 ## Пояснения к выполненной работе
 
