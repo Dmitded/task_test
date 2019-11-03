@@ -1,4 +1,4 @@
-from libs.errors import HTTPBadRequest
+# from libs.errors import HTTPBadRequest
 
 # Python 3
 try:

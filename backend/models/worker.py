@@ -7,7 +7,7 @@ from models.meta import Base
 
 from enum import Enum
 # from lib.errors import HTTPNotFound
-# from libs.barcodes import calculate_checksum
+from libs.barcodes import calculate_checksum
 
 
 class WorkerType(Enum):
