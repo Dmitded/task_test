@@ -18,6 +18,8 @@ WORKERS = \
         'type': ['INSPECTOR', 'COLLECTOR', 'COLLECTOR', 'COLLECTOR']
     }
 
+inspector_data = ['ean13: ', '25', 'password: ']
+
 
 def create_workers():
 
@@ -36,6 +38,9 @@ def create_workers():
             worker.db_session.commit()
         except Exception:
             falcon.HTTPUnprocessableEntity()
+
+        if i == 0:
+            inspector_data.append(str(worker.password))
 
 
 def generate_box_index(box_code_index):
@@ -100,3 +105,10 @@ def create_activity_log():
 
 create_workers()
 create_activity_log()
+
+f = open('inspector.txt', 'w')
+
+for index in inspector_data:
+    f.write(index + '\n')
+
+f.close()
