@@ -69,23 +69,31 @@
           <v-icon>mdi-exit-to-app</v-icon>
         </v-btn>
       </v-toolbar>
-
-      <v-flex lg4>
-        <v-data-table
-          :headers="headers"
-          :items="desserts"
-          :sort-by="[]"
-          :sort-desc="[false, true]"
-          :items-per-page="-1"
-          :search="search"
-          multi-sort
-          class="elevation-1 mb-5"
-        >
-        <template v-slot:item.status="{ item }">
-          <v-chip :color="getColor(item.status)" dark>{{ item.status }}</v-chip>
-        </template>
-        </v-data-table>
-      </v-flex>
+      <v-layout row mx-auto>
+        <v-flex lg4>
+          <v-data-table
+            :headers="headers"
+            :items="desserts"
+            :sort-by="[]"
+            :sort-desc="[false, true]"
+            :items-per-page="-1"
+            :search="search"
+            multi-sort
+            class="elevation-1 mb-5"
+          >
+          <template v-slot:item.status="{ item }">
+            <v-chip :color="getColor(item.status)" dark>{{ item.status }}</v-chip>
+          </template>
+          </v-data-table>
+        </v-flex>
+        <v-flex lg8>
+          <div class="Chart__list">
+            <div class="Chart">
+              <line-chart></line-chart>
+            </div>
+          </div>
+        </v-flex>
+      </v-layout>
     </v-container>
   </v-content>
 </template>
@@ -110,6 +118,8 @@ export default {
         },
         { text: 'Килограммов', align: 'center', value: 'payload' },
         { text: 'Статус', align: 'center', value: 'status' }
+      ],
+      component: [
       ],
       desserts: [
         {
