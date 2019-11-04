@@ -11,6 +11,7 @@
             data-vv-name="login"
             color="error"
             label="Введите Login"
+            v-on:keyup.enter="login"
           ></v-text-field>
           <v-text-field
             v-model="user.password"
@@ -20,6 +21,7 @@
             color="error"
             type="password"
             label="Введите пароль"
+            v-on:keyup.enter="login"
           ></v-text-field>
           <v-flex pt-3>
             <v-btn color="error" width="100%" @click="login">Войти</v-btn>
