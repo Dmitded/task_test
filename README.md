@@ -55,8 +55,8 @@ create database tasktest;
 ```bash
 cd backend
 python3 -m venv env
-./env/bin/pip3 install - r requirements.txt
-alembic upgrade head # запуск миграций
+./env/bin/pip3 install -r requirements.txt
+./env/bin/alembic upgrade head # запуск миграций
 chmod +x test_data.py
 ./test_data.py # заполнение БД тестовыми значениями и запись данных для входа в файл inspector.txt
 ./dev.sh # запуск (gunicorn)
