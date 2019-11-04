@@ -72,8 +72,8 @@
             color="error"
             :max="maxDate"></v-date-picker>
           </v-menu>
-          <v-btn class="d-none d-sm-flex" text @click="dataUpdate">Обновить данные</v-btn>
-          <v-btn class="d-flex d-sm-none" text @click="dataUpdate">Обновить</v-btn>
+          <v-btn class="d-none d-sm-flex" text @click="dataUpdate(maxDate), picker = maxDate">Обновить данные</v-btn>
+          <v-btn class="d-flex d-sm-none" text @click="dataUpdate(maxDate), picker = maxDate">Обновить</v-btn>
         </v-toolbar-items>
 
         <v-btn icon @click="logout">
@@ -171,7 +171,7 @@ export default {
 
   watch: {
     picker: function () {
-      this.dataUpdate()
+      this.dataUpdate(this.picker)
     }
   },
 
@@ -188,8 +188,8 @@ export default {
   },
 
   methods: {
-    async dataUpdate () {
-      await this.$store.dispatch('getData', this.picker)
+    async dataUpdate (date) {
+      await this.$store.dispatch('getData', date)
       let dataworker = this.$store.state.user.workers.payload_data
       let tempData = []
       dataworker.forEach(function (element) {
