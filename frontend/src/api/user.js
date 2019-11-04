@@ -4,7 +4,7 @@ export default {
   async login (credentials) {
     try {
       await axios.post('/login', {
-        login: credentials.login,
+        ean13: parseInt(credentials.login),
         password: credentials.password
       })
     } catch (error) {
@@ -29,6 +29,15 @@ export default {
     }
   },
 
+  async getData () {
+    try {
+      const workers = await axios.get('/activity?day=2019-05-13')
+      return workers.data
+    } catch (error) {
+      return error.response.status
+    }
+  }
+
   // async register (credentials) {
   //   try {
   //     await axios.post('/users', {
@@ -40,14 +49,4 @@ export default {
   //     return error.response.status
   //   }
   // },
-
-  async getData () {
-    try {
-      const current = await axios.get('/current')
-      console.log(current.data)
-      return current.data
-    } catch (error) {
-      return error.response.status
-    }
-  }
 }

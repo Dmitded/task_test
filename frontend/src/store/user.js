@@ -3,29 +3,28 @@ import userAPI from '@/api/user'
 export default {
 
   state: {
-    user: undefined,
-    current: undefined
+    current: undefined,
+    workers: undefined
   },
 
   mutations: {
-    setData (state, current) {
-      state.current = current
-    },
-
     setUser (state, user) {
-      state.user = user
+      state.current = user
+    },
+    setWorkers (state, workers) {
+      state.workers = workers
     }
   },
 
   actions: {
-    async login ({ commit }, credentials) {
+    async login (credentials) {
       await userAPI.login(credentials)
     },
 
     async getCurrentUser ({ commit }) {
-      const user = await userAPI.getCurrentUser()
-      if (user !== 401) {
-        commit('setUser', user)
+      const users = await userAPI.getCurrentUser()
+      if (users !== 401 && 502) {
+        commit('setUser', users)
       }
     },
 
@@ -36,13 +35,15 @@ export default {
       }
     },
 
+    async getData ({ commit }) {
+      const workers = await userAPI.getData()
+      if (workers !== 401 && 502) {
+        commit('setWorkers', workers)
+      }
+    }
+
     // async register ({ commit }, credentials) {
     //   await userAPI.register(credentials)
     // },
-
-    async getData ({ commit }) {
-      const users = await userAPI.getData()
-      commit('setData', users)
-    }
   }
 }

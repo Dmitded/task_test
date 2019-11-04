@@ -47,7 +47,7 @@
 
     <v-container class="my-0 py-0" v-if="loginShow === true">
       <v-toolbar color="error" dark class="my-3">
-        <v-toolbar-title>Панель менеджера</v-toolbar-title>
+        <v-toolbar-title>Менеджер {{ NameCurrent }}</v-toolbar-title>
 
         <v-spacer></v-spacer>
 
@@ -63,17 +63,18 @@
             append-icon="search"
           ></v-text-field>
           <v-btn text>Выбор даты</v-btn>
+          <v-btn text @click="dataUpdate">Обновить данные</v-btn>
         </v-toolbar-items>
 
         <v-btn icon @click="logout">
           <v-icon>mdi-exit-to-app</v-icon>
         </v-btn>
       </v-toolbar>
-      <v-layout row mx-auto>
-        <v-flex lg4>
+      <v-flex justify-space-around row mx-auto>
+        <v-flex lg4 mt-8>
           <v-data-table
             :headers="headers"
-            :items="desserts"
+            :items="workers"
             :sort-by="[]"
             :sort-desc="[false, true]"
             :items-per-page="-1"
@@ -81,25 +82,19 @@
             multi-sort
             class="elevation-1 mb-5"
           >
-          <template v-slot:item.status="{ item }">
-            <v-chip :color="getColor(item.status)" dark>{{ item.status }}</v-chip>
-          </template>
           </v-data-table>
         </v-flex>
         <v-flex lg8>
-          <div class="Chart__list">
-            <div class="Chart">
-              <line-chart></line-chart>
-            </div>
-          </div>
+          <line-chart :chartData="chartData" class="graph"></line-chart>
         </v-flex>
-      </v-layout>
+      </v-flex>
     </v-container>
   </v-content>
 </template>
 
 <script>
 import authAPI from '@/api/user'
+import chart from '@/components/Chart.js'
 
 export default {
   $_veeValidate: {
@@ -117,37 +112,18 @@ export default {
           value: 'worker'
         },
         { text: 'Килограммов', align: 'center', value: 'payload' },
-        { text: 'Статус', align: 'center', value: 'status' }
+        { text: 'Час', align: 'center', value: 'hour' }
       ],
       component: [
+        chart
       ],
-      desserts: [
-        {
-          worker: 'Frozen Yogurt',
-          payload: 6.0,
-          status: 'Выполнено'
-        },
-        {
-          worker: 'Ice cream sandwich',
-          payload: 6.0,
-          status: 'В процессе'
-        },
-        {
-          worker: 'Eclair',
-          payload: 6.0,
-          status: 'Ошибка'
-        },
-        {
-          worker: 'Cupcake',
-          payload: 6.0,
-          status: 'Выполнено'
-        }
-      ],
-      loginShow: true,
+      workers: [],
+      loginShow: false,
       user: {
         login: '',
         password: ''
       },
+      chartData: undefined,
       dictionary: {
         custom: {
           login: {
@@ -158,6 +134,7 @@ export default {
           }
         }
       },
+      NameCurrent: '',
       notification: {
         snackbar: false,
         y: 'top',
@@ -171,25 +148,50 @@ export default {
     this.$validator.localize('en', this.dictionary)
   },
 
+  created () {
+    if (this.$store.state.user.current) {
+      let name = this.$store.state.user.current
+      this.loginShow = true
+      this.NameCurrent = name.name + ' ' + name.middle_name
+    }
+  },
+
   methods: {
-    getColor (status) {
-      if (status === 'Ошибка') return 'red'
-      else if (status === 'В процессе') return 'orange'
-      else return 'green'
+    async dataUpdate () {
+      await this.$store.dispatch('getData')
+      let dataworker = this.$store.state.user.workers.payload_data
+      let tempData = []
+      dataworker.forEach(function (element) {
+        var temp = {}
+        temp.hour = element.hour
+        temp.payload = element.payload_in_hour
+        temp.worker = element.worker_data.name + ' ' + element.worker_data.middle_name + ' ' + element.worker_data.surname
+        tempData.push(
+          temp
+        )
+      })
+      this.workers = tempData
+      this.graphUp()
     },
     async login () {
       const valid = await this.$validator.validate()
       if (valid) {
         const resp = await authAPI.login(this.user)
-        if (resp === 401) {
+        if ((resp === 401) || (resp === 403)) {
           this.notification.snackbar = true
           this.user.login = ''
           this.user.password = ''
         } else {
-          await this.$store.dispatch('getData')
+          await this.$store.dispatch('getCurrentUser')
           this.user.login = ''
           this.user.password = ''
-          this.loginShow = true
+          if (this.$store.state.user.current.name) {
+            let name = this.$store.state.user.current
+            this.loginShow = true
+            this.NameCurrent = name.name + ' ' + name.middle_name
+            this.dataUpdate()
+            this.graphUp()
+          }
         }
       }
     },
@@ -197,6 +199,76 @@ export default {
     async logout () {
       await this.$store.dispatch('logout')
       this.loginShow = false
+    },
+
+    makeid () {
+      var result = ''
+      var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+      var charactersLength = characters.length
+      for (var i = 0; i < 6; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength))
+      }
+      return result
+    },
+
+    graphUp () {
+      let dataworker = this.$store.state.user.workers.payload_data
+      let datalenght = this.$store.state.user.workers.amount
+
+      let test = []
+      let tempid = {
+        id: undefined
+      }
+
+      let testInt = 1
+      let temp = {
+        data: [0, 0, 0, 0, 0, 0, 0, 0, 0]
+      }
+
+      dataworker.forEach(function (element) {
+        var result = ''
+        var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+        var charactersLength = characters.length
+
+        if (tempid.id === undefined) {
+          tempid.id = element.worker_id
+          temp.label = element.worker_data.name + ' ' + element.worker_data.middle_name + ' ' + element.worker_data.surname
+          temp.data[element.hour - 11] = element.payload_in_hour
+          for (var i = 0; i < 6; i++) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength))
+          }
+          temp.backgroundColor = '#' + result + 'aa'
+        } if (datalenght === testInt) {
+          tempid.id = element.worker_id
+          temp.label = element.worker_data.name + ' ' + element.worker_data.middle_name + ' ' + element.worker_data.surname
+          temp.data[element.hour - 11] = element.payload_in_hour
+          for (var j = 0; j < 6; j++) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength))
+          }
+          temp.backgroundColor = '#' + result + 'aa'
+          test.push(temp)
+        } if (tempid.id === element.worker_id) {
+          temp.data[element.hour - 11] = element.payload_in_hour
+          ++testInt
+        } else {
+          test.push(temp)
+          tempid.id = element.worker_id
+          temp = {
+            data: [0, 0, 0, 0, 0, 0, 0, 0, 0]
+          }
+          temp.label = element.worker_data.name + ' ' + element.worker_data.middle_name + ' ' + element.worker_data.surname
+          temp.data[element.hour - 11] = element.payload_in_hour
+          for (var n = 0; n < 6; n++) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength))
+          }
+          temp.backgroundColor = '#' + result + 'aa'
+          ++testInt
+        }
+      })
+      this.chartData = {
+        labels: ['11', '12', '13', '14', '15', '16', '17', '18', '19'],
+        datasets: test
+      }
     }
   }
 }
@@ -206,5 +278,8 @@ export default {
   .login {
     height: 100vh;
     justify-content: center;
+  }
+  .graph {
+    height: 400px;
   }
 </style>
