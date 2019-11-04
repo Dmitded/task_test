@@ -63,7 +63,7 @@ chmod +x test_data.py
 ```
 
 ### frontend
-cd backend
+cd frontend
 
 ## Установка проекта
 ```
