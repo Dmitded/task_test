@@ -63,8 +63,21 @@ chmod +x test_data.py
 ```
 
 ### frontend
+cd backend
 
-В разработке
+## Установка проекта
+```
+npm install
+```
+
+### Компиляция и hot-reload для разработки
+```
+npm run serve
+```
+
+### Сборка под продакшн
+```
+npm run build
 
 
 ### Описание API

@@ -35,8 +35,8 @@ export default {
       }
     },
 
-    async getData ({ commit }) {
-      const workers = await userAPI.getData()
+    async getData ({ commit }, date) {
+      const workers = await userAPI.getData(date)
       if (workers !== 401 && 502) {
         commit('setWorkers', workers)
       }

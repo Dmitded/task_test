@@ -1,4 +1,4 @@
-# Frontend Каркас на VueJS для Like Center Test версия 0.0.0
+# Frontend на VueJS для Like Center Test версия 0.1.0
 
 ## Установка проекта
 ```

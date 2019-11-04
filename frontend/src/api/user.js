@@ -29,16 +29,16 @@ export default {
     }
   },
 
-  async getData () {
+  async getData (date) {
     try {
-      const workers = await axios.get('/activity?day=2019-05-13')
+      const workers = await axios.get(`/activity?day=${date}`)
       return workers.data
     } catch (error) {
       return error.response.status
     }
   }
 
-  // async register (credentials) {
+  // async register (credentials) {2019-05-13
   //   try {
   //     await axios.post('/users', {
   //       login: credentials.login,

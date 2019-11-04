@@ -47,14 +47,13 @@
 
     <v-container class="my-0 py-0" v-if="loginShow === true">
       <v-toolbar color="error" dark class="my-3">
-        <v-toolbar-title>Менеджер {{ NameCurrent }}</v-toolbar-title>
+        <v-toolbar-title class="d-none d-sm-flex">Менеджер {{ NameCurrent }}</v-toolbar-title>
 
-        <v-spacer></v-spacer>
+        <v-spacer class="d-none d-sm-flex"></v-spacer>
 
         <v-toolbar-items>
-
           <v-text-field
-            class="my-auto"
+            class="my-auto d-none d-sm-flex"
             v-model="search"
             label="Search"
             color="white"
@@ -62,16 +61,39 @@
             hide-details
             append-icon="search"
           ></v-text-field>
-          <v-btn text>Выбор даты</v-btn>
-          <v-btn text @click="dataUpdate">Обновить данные</v-btn>
+
+          <v-menu offset-y>
+            <template v-slot:activator="{ on }">
+              <v-btn text v-on="on">Выбор даты</v-btn>
+            </template>
+            <v-date-picker
+            class="mt-5"
+            v-model="picker"
+            color="error"
+            :max="maxDate"></v-date-picker>
+          </v-menu>
+          <v-btn class="d-none d-sm-flex" text @click="dataUpdate">Обновить данные</v-btn>
+          <v-btn class="d-flex d-sm-none" text @click="dataUpdate">Обновить</v-btn>
         </v-toolbar-items>
 
         <v-btn icon @click="logout">
           <v-icon>mdi-exit-to-app</v-icon>
         </v-btn>
       </v-toolbar>
-      <v-flex justify-space-around row mx-auto>
+      <v-flex justify-space-around row mx-auto flex-row-reverse>
+        <v-flex lg8>
+          <line-chart :chartData="chartData" :options="options"></line-chart>
+        </v-flex>
         <v-flex lg4 mt-8>
+          <v-text-field
+            class="my-auto d-flex d-sm-none"
+            v-model="search"
+            label="Search"
+            color="white"
+            single-line
+            hide-details
+            append-icon="search"
+          ></v-text-field>
           <v-data-table
             :headers="headers"
             :items="workers"
@@ -83,9 +105,6 @@
             class="elevation-1 mb-5"
           >
           </v-data-table>
-        </v-flex>
-        <v-flex lg8>
-          <line-chart :chartData="chartData" class="graph"></line-chart>
         </v-flex>
       </v-flex>
     </v-container>
@@ -104,6 +123,8 @@ export default {
   name: 'Home',
   data () {
     return {
+      maxDate: new Date().toISOString().substr(0, 10),
+      picker: new Date().toISOString().substr(0, 10),
       search: '',
       headers: [
         {
@@ -124,6 +145,10 @@ export default {
         password: ''
       },
       chartData: undefined,
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      },
       dictionary: {
         custom: {
           login: {
@@ -144,6 +169,12 @@ export default {
     }
   },
 
+  watch: {
+    picker: function () {
+      this.dataUpdate()
+    }
+  },
+
   mounted () {
     this.$validator.localize('en', this.dictionary)
   },
@@ -158,7 +189,7 @@ export default {
 
   methods: {
     async dataUpdate () {
-      await this.$store.dispatch('getData')
+      await this.$store.dispatch('getData', this.picker)
       let dataworker = this.$store.state.user.workers.payload_data
       let tempData = []
       dataworker.forEach(function (element) {
@@ -201,16 +232,6 @@ export default {
       this.loginShow = false
     },
 
-    makeid () {
-      var result = ''
-      var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-      var charactersLength = characters.length
-      for (var i = 0; i < 6; i++) {
-        result += characters.charAt(Math.floor(Math.random() * charactersLength))
-      }
-      return result
-    },
-
     graphUp () {
       let dataworker = this.$store.state.user.workers.payload_data
       let datalenght = this.$store.state.user.workers.amount
@@ -227,8 +248,8 @@ export default {
 
       dataworker.forEach(function (element) {
         var result = ''
-        var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-        var charactersLength = characters.length
+        var characters = 'abcdefghijklmnopqrstuvwxyz0123456789'
+        var charactersLength = 6
 
         if (tempid.id === undefined) {
           tempid.id = element.worker_id
@@ -280,6 +301,6 @@ export default {
     justify-content: center;
   }
   .graph {
-    height: 400px;
+    height: 400px !important;
   }
 </style>
